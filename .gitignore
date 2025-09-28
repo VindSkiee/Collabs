@@ -1,0 +1,38 @@
+# Node modules
+be/node_modules/
+
+# Logs
+be/logs/
+be/*.log
+be/npm-debug.log*
+be/yarn-debug.log*
+be/yarn-error.log*
+
+# Environment variables
+be/.env
+be/.env.local
+
+# Database
+be/*.sqlite
+be/*.db
+be/*.pgsql
+
+# OS generated files
+be/.DS_Store
+be/Thumbs.db
+
+# VSCode settings
+be/.vscode/
+
+# Build output
+be/dist/
+be/build/
+
+# Coverage
+be/coverage/
+
+# Misc
+be/*.local
+be/.idea/
+be/*.swp
+be/config/env.js

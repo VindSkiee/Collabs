@@ -1,0 +1,242 @@
+Collabs - Fast, Flexible, Simple
+
+Tech Stack 
+
+ 🌐 Frontend (pilih salah satu)
+
+1. React (Vite/Next.js)
+
+    ✅ Ekosistem super besar (UI kits, integrasi enterprise, library lengkap)
+    ✅ Banyak developer → gampang scaling tim
+    ✅ Mature, battletested (Teams, Slack, Notion pakai React)
+    ⚠️ Lebih banyak boilerplate daripada Svelte
+
+2. Svelte (SvelteKit)
+
+    ✅ Super ringan & cepat (compile ke JS vanilla)
+    ✅ Syntax clean & reactive by default → lebih simpel
+    ✅ SvelteKit allinone (routing, SSR, API endpoint bawaan)
+    ⚠️ Ekosistem lebih kecil, dev Svelte lebih susah dicari
+
+Catatan:
+
+ Kalau targetnya MVP cepat & ringan → Svelte lebih cocok.
+ Kalau targetnya scalable enterprise → React lebih aman.
+
+
+ ⚙️ Backend
+
+ Node.js + Express (atau Fastify) → ringan, fleksibel, ekosistem luas.
+ Socket.IO (atau ws) → untuk chat & notif realtime.
+ BullMQ (Redis based) → job queue (notifikasi email, background task).
+
+(Opsional: NestJS kalau mau arsitektur enterprise yang lebih terstruktur).
+
+
+ 🗄️ Database
+
+ PostgreSQL → data utama (users, teams, channels, tasks).
+ Redis → caching + presence + pub/sub untuk realtime event.
+ (Opsional) MongoDB → kalau mau simpan chat messages dalam document store.
+
+
+ 📦 Infrastructure & Deployment
+
+ Docker → containerization (easy deploy).
+ NGINX / Traefik → reverse proxy + load balancing.
+ Hosting:
+
+   MVP: Railway / Render / Supabase.
+   Scale: AWS ECS/EKS, GCP Cloud Run, atau DigitalOcean.
+
+
+ 🔍 Search & Extra
+
+ Meilisearch / ElasticSearch → search cepat (messages, tasks, channels).
+ File Storage:
+
+   MVP: Supabase Storage / Firebase Storage.
+   Scale: AWS S3 / MinIO.
+
+
+ 🔒 Security
+
+ JWT / OAuth2 → auth & integrasi login.
+ Helmet.js + Rate limiter → proteksi API.
+ E2EE (opsional) → kalau positioning ke arah privacyfirst.
+
+
+📌 Jadi pilihan besarnya cuma di Frontend:
+
+ React = ekosistem besar, lebih “enterprisefriendly”.
+ Svelte = cepat, ringan, simple → MVP bisa sangat nyaman dipakai.
+
+
+
+------------------------------------------------------------------------------------------------------
+FRAMEWORK
+
+Oke mantap 👌. Saya akan susun seluruh visi Anda menjadi poin besar + poin kecil biar jadi dokumen rencana proyek Collabs yang rapi. Semua fitur dari Chat, Channel, Task, plus tambahan UX seperti onboarding, dashboard, command palette, dan notifikasi saya satukan.
+
+
+
+ 📌 Rencana Proyek Collabs
+
+
+
+ 1. Team & Role Management
+
+ Leader Tim (Super Leader)
+
+   Pembuat tim otomatis menjadi Leader tim.
+   Memiliki kontrol penuh atas semua channel & task dalam tim.
+ Leader Channel
+
+   Memimpin hanya channel yang ia buat.
+   Bisa membuat task dalam channel tersebut.
+ Member
+
+   Dapat join tim & channel.
+   Bisa diberi tugas oleh Leader.
+
+
+
+ 2. Channel
+
+ Jenis Channel
+
+   Open → semua anggota tim bisa join tanpa persetujuan.
+   Private → butuh persetujuan Leader channel.
+   Locked → channel tidak menerima anggota baru.
+ Fitur dalam Channel
+
+   Chat grup (mirip WhatsApp Group).
+   Unggah file (dokumen, gambar, video, dsb).
+   Meeting khusus channel.
+ Hak Akses
+
+   Leader tim → bisa masuk & kelola semua channel.
+   Leader channel → kelola channel yang ia buat.
+   Member → hanya join & ikut aktivitas channel.
+
+
+
+ 3. Task Management
+
+ Pembuatan Task
+
+   Hanya Leader channel yang dapat membuat task.
+   Task bisa berupa:
+
+     Task besar (utama).
+     List subtask (turunan dari task besar).
+ Fitur dalam Task
+
+   Chat khusus task (mirip grup chat).
+   Meeting khusus task.
+   Komentar progres.
+   Upload file progres.
+   Penugasan anggota ke task.
+ Status Task
+
+   `TODO` → belum dikerjakan.
+   `On Process` → sedang dikerjakan.
+   `In Review` → menunggu konfirmasi leader.
+   `Done` → selesai.
+ Meeting dalam Task
+
+   Leader channel bisa langsung memanggil meeting untuk semua anggota task.
+
+
+
+ 4. Chat System
+
+ Chat dapat terjadi di beberapa level:
+
+   Channel Chat → untuk semua anggota channel.
+   Task Chat → khusus task besar.
+   Subtask Chat (opsional) → untuk diskusi detail.
+ Fitur tambahan:
+
+   Reply pesan.
+   Upload file dalam chat.
+   Mention user.
+
+
+
+ 5. Meeting System
+
+ Meeting bisa terjadi di beberapa level:
+
+   Team Meeting → untuk semua anggota tim.
+   Channel Meeting → untuk semua anggota channel.
+   Task Meeting → untuk semua anggota task/subtask.
+ Mendukung integrasi provider eksternal (contoh: Zoom, Daily, Agora).
+
+
+
+ 6. File & Attachment
+
+ File bisa diunggah ke:
+
+   Chat dalam channel.
+   Chat dalam task.
+   Progres task/subtask.
+ Disimpan dengan informasi: uploader, nama file, ukuran, link storage (S3/Cloud).
+
+
+
+ 7. Onboarding Cerdas (Welcome Checklist)
+
+ Checklist interaktif untuk Leader tim baru:
+  ✅ Undang anggota pertama.
+  🔲 Buat channel pertama.
+  🔲 Buat tugas pertama.
+ Membantu pengguna memahami nilai aplikasi dengan belajar sambil melakukan.
+
+
+
+ 8. Dashboard "My Work"
+
+ Satu halaman khusus untuk fokus kerja:
+
+   Semua tugas saya dari semua channel, diurutkan deadline.
+   Mention terbaru yang ditujukan ke saya.
+   Permintaan join channel yang menunggu persetujuan saya (jika leader).
+ Mengurangi kebingungan & memberi tampilan prioritas personal.
+
+
+
+ 9. Command Palette (Ctrl/Cmd + K)
+
+ Pintasan keyboard untuk poweruser.
+ Fungsi cepat:
+
+   Pindah channel (`channelname`).
+   Cari tugas tertentu.
+   Mulai meeting instan.
+   Invite user via email.
+ Memberikan pengalaman profesional & cepat tanpa menambah kerumitan UI.
+
+
+
+ 10. Notifikasi Terpusat
+
+ Ikon 🔔 untuk semua notifikasi:
+
+   Undangan tim.
+   Mention.
+   Task baru.
+   Komentar task.
+ Bisa tandai semua sebagai “read” dengan sekali klik.
+ Mengurangi distraksi & memberi kontrol penuh pada user.
+
+
+
+👉 Jadi, dokumen ini bisa langsung Anda gunakan sebagai blueprint rencana proyek Collabs:
+
+ Bagian 1–6 → core features (fungsi inti).
+ Bagian 7–10 → UX & produktivitas (nilai tambah).
+
+Apakah mau saya lanjut bikinkan diagram ERD (Entity Relationship Diagram) dari skema database SQL yang tadi supaya Anda punya gambaran visual keterkaitan tabel?
+
