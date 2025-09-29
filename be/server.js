@@ -10,6 +10,7 @@ import { pool } from "./config/db.js";
 import { ENV } from "./config/env.js";
 import hpp from "hpp";
 import { sanitizeMiddleware } from "./src/middlewares/sanitize.middleware.js";
+import authRouter from "./src/modules/auth/auth.route.js";
 
 const app = express();
 
@@ -43,7 +44,7 @@ app.use(
 // CORS
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:3000" || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -54,7 +55,7 @@ app.use(hpp());
 app.use(sanitizeMiddleware);
 
 // // Router
-// app.use("/api/v1/auth", authRouter); // auth route
+app.use("/api/v1/auth", authRouter); // auth route
 // app.use("/api/v1/user", userRouter); // user route
 // app.use("/api/v1/team", teamRouter); // team route
 // app.use("/api/v1/task", tasksRouter); // tasks route
@@ -72,6 +73,7 @@ app.get("/", (req, res) => {
 app.use(errorMiddleware);
 
 // Start Server
+
 app.listen(ENV.PORT, async () => {
   try {
     await pool.query("SELECT 1");

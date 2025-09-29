@@ -1,35 +1,26 @@
-export const errorMiddleware = (err, req, res, next) => {
-  try {
-    let error = { ...err };
+import { logger } from "../utils/logger.js";
 
-    error.message = err.message;
-    console.log(err);
+/**
+ * Error handling middleware
+ * Menangani error dari seluruh aplikasi Express
+ */
+export function errorMiddleware(err, req, res, next) {
+  // Log error detail
+  logger.error(err.stack || err.message || err);
 
-    // Mongoose bad ObjectId
-    if (err.name === "CastError") {
-      const message = "Resource not found";
-      error = new Error(message);
-      error.statusCode = 404;
-    }
+  // Tentukan status code (default: 500)
+  const status = err.status || err.statusCode || 500;
 
-    // Mongoose duplicate key
-    if (err.code === 11000) { // ⚠️ harusnya err.code, bukan err.name
-      const message = "Duplicate key value entered";
-      error = new Error(message);
-      error.statusCode = 400;
-    }
+  // Pesan error yang aman untuk dikirim ke client
+  const message =
+    err.message ||
+    (status === 500
+      ? "Internal Server Error"
+      : "An error occurred");
 
-    // Mongoose validation error
-    if (err.name === "ValidationError") {
-      const message = Object.values(err.errors).map((val) => val.message);
-      error = new Error(message.join(", "));
-      error.statusCode = 400;
-    }
-
-    res
-      .status(error.statusCode || 500)
-      .json({ success: false, error: error.message || "Server Error" });
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(status).json({
+    success: false,
+    message,
+    errors: err.errors || undefined,
+  });
+}

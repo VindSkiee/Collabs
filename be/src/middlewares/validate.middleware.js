@@ -1,5 +1,4 @@
 // src/middlewares/validate.middleware.js
-// src/middlewares/validate.middleware.js
 export const validate = (schema) => (req, res, next) => {
   try {
     schema.parse({
