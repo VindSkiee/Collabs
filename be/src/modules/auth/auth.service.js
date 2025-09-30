@@ -85,7 +85,7 @@ export async function registerWithPassword({ email, username, password }) {
     throw new Error("User already exists with this email");
   }
 
-  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(password, ENV.SALT_ROUNDS);
 
   const user = await insertUserWithPassword({
     email,
@@ -118,6 +118,6 @@ export async function loginWithPassword({ email, password }) {
  * Ubah password user
  */
 export async function changePassword(userId, newPassword) {
-  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(newPassword, ENV.SALT_ROUNDS);
   return await updateUserPassword(userId, hashedPassword);
 }

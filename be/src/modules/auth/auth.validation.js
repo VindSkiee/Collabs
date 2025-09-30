@@ -2,14 +2,26 @@
 import { z } from "zod";
 import xss from "xss";
 
+// --- Login Schema ---
 export const loginSchema = z.object({
   body: z.object({
-    username: z.string().min(3, "Username minimal 3 karakter").transform((val) => xss(val)),
-    email: z.string().email("Email tidak valid").transform((val) => xss(val)),
-    password: z.string().min(6, "Password minimal 6 karakter").transform((val) => xss(val)),
+    username: z
+      .string()
+      .min(3, "Username minimal 3 karakter")
+      .transform((val) => xss(val)),
+    email: z
+      .string()
+      .nonempty("Email diperlukan")
+      .email("Email tidak valid")
+      .transform((val) => xss(val)),
+    password: z
+      .string()
+      .min(6, "Password minimal 6 karakter")
+      .transform((val) => xss(val)),
   }),
 });
 
+// --- Register Schema ---
 export const registerSchema = z.object({
   body: z.object({
     username: z
@@ -20,6 +32,7 @@ export const registerSchema = z.object({
 
     email: z
       .string()
+      .nonempty("Email diperlukan")
       .email("Email tidak valid")
       .transform((val) => xss(val)),
 

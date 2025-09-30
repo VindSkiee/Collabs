@@ -8,7 +8,6 @@ import {
 } from "./auth.service.js";
 import { ENV } from "../../../config/env.js";
 import { oauthCallbackHandler } from "../users/users.controller.js";
-import { success } from "zod";
 import { sendLoginSuccessEmail } from "../email/email.service.js";
 
 /**
@@ -52,28 +51,29 @@ export async function loginWithGoogle(req, res, next) {
   }
 }
 
-/**
- * Login GitHub
- */
-export async function loginWithGithub(req, res, next) {
+export async function githubOAuthCallback(req, res, next) {
   try {
-    const { code } = req.body;
-    if (!code) {
-      return res.status(400).json({ message: "Code is required" });
-    }
+    const { code } = req.query; // ambil dari query, bukan body
+    if (!code) return res.status(400).send("Code is required");
 
+    // Tukar code -> ambil user dari GitHub
     const githubUser = await verifyGithubCode(code);
 
+    // Masukkan atau dapatkan user dari DB
     const user = await oauthCallbackHandler({
       provider: "github",
       provider_id: githubUser.github_id,
       email: githubUser.email,
-      name: githubUser.name,
+      name: githubUser.username,
       picture: githubUser.picture,
     });
 
+    // Buat JWT
     const jwtToken = generateJWT(user);
-    res.status(200).json({ user, token: jwtToken });
+
+    await sendLoginSuccessEmail(user.email, user.username);
+    // Redirect ke frontend dengan token
+    res.redirect(`http://localhost:3000?token=${jwtToken}`);
   } catch (error) {
     next(error);
   }
@@ -116,6 +116,8 @@ export async function loginRegular(req, res, next) {
     next(error);
   }
 }
+
+
 
 /**
  * Ganti password

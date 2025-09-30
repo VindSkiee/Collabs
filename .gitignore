@@ -36,3 +36,6 @@ be/*.local
 be/.idea/
 be/*.swp
 be/config/env.js
+sonar-project.properties
+.scannerwork/.sonar_lock
+.scannerwork/report-task.txt
