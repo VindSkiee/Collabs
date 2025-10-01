@@ -99,3 +99,16 @@ export const remove = async (teamId) => {
   };
   await pool.query(query);
 };
+
+export const isMemberOfTeam = async (userId, teamId) => {
+  const query = {
+    text: `SELECT 1 
+           FROM team_members 
+           WHERE user_id = $1 AND team_id = $2`,
+    values: [userId, teamId],
+  };
+
+  const result = await pool.query(query);
+  // Jika ada row berarti user sudah menjadi member
+  return result.rowCount > 0;
+};
