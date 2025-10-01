@@ -87,3 +87,12 @@ export async function updateUserPassword(userId, hashedPassword) {
   );
   return res.rows[0];
 }
+
+export async function findById(userId) {
+    const query = {
+      text: `SELECT id, username, email FROM users WHERE id = $1`,
+      values: [userId],
+    };
+    const result = await pool.query(query);
+    return result.rows[0];
+};
