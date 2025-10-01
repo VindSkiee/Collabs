@@ -2,25 +2,32 @@ import { logger } from "../utils/logger.js";
 
 /**
  * Error handling middleware
- * Menangani error dari seluruh aplikasi Express
  */
 export function errorMiddleware(err, req, res, next) {
-  // Log error detail
-  logger.error(err.stack || err.message || err);
+  // Log detail error (stack hanya kalau bukan AppError)
+  if (err.isOperational) {
+    logger.warn(`${err.statusCode} - ${err.message}`);
+  } else {
+    logger.error(err.stack || err.message || err);
+  }
 
-  // Tentukan status code (default: 500)
-  const status = err.status || err.statusCode || 500;
+  // Ambil statusCode dari AppError, fallback 500
+  const statusCode = err.statusCode || 500;
+  const status = err.status || (statusCode.toString().startsWith("4") ? "fail" : "error");
 
-  // Pesan error yang aman untuk dikirim ke client
-  const message =
-    err.message ||
-    (status === 500
-      ? "Internal Server Error"
-      : "An error occurred");
-
-  res.status(status).json({
+  // Buat response
+  const response = {
     success: false,
-    message,
-    errors: err.errors || undefined,
-  });
+    status,
+    message: err.isOperational
+      ? err.message
+      : "Internal Server Error", // jangan bocorin bug
+  };
+
+  // Tambahin detail hanya di dev (buat debugging)
+  if (process.env.NODE_ENV === "development" && !err.isOperational) {
+    response.stack = err.stack;
+  }
+
+  res.status(statusCode).json(response);
 }

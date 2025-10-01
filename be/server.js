@@ -10,7 +10,14 @@ import { pool } from "./config/db.js";
 import { ENV } from "./config/env.js";
 import hpp from "hpp";
 import { sanitizeMiddleware } from "./src/middlewares/sanitize.middleware.js";
+
 import authRouter from "./src/modules/auth/auth.route.js";
+import teamRouter from "./src/modules/teams/teams.route.js";
+// import userRouter from "./src/modules/users/user.route.js";
+// import tasksRouter from "./src/modules/tasks/tasks.route.js";
+// import invitationRouter from "./src/modules/invitations/invitation.route.js";
+// import channelRouter from "./src/modules/channels/channel.route.js";
+// import meetingRouter from "./src/modules/meetings/meeting.route.js";
 
 const app = express();
 
@@ -18,9 +25,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-// Rate limiting
-app.use(apiLimiter);
 
 // Logging
 app.use(
@@ -60,11 +64,14 @@ app.use(sanitizeMiddleware);
 // // Router
 app.use("/api/v1/auth", authRouter); // auth route
 // app.use("/api/v1/user", userRouter); // user route
-// app.use("/api/v1/team", teamRouter); // team route
+app.use("/api/v1/team", teamRouter); // team route
 // app.use("/api/v1/task", tasksRouter); // tasks route
 // app.use("/api/v1/invitation", invitationRouter); // invitation route
 // app.use("/api/v1/channel", channelRouter); // channel route
 // app.use("/api/v1/meeting", meetingRouter); // meetings route
+
+// Rate limiting
+app.use(apiLimiter);
 
 // Routes example
 app.get("/", (req, res) => {
