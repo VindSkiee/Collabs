@@ -1,4 +1,13 @@
-import { getAllTeamsForUser, createNewTeam, getTeamById, updateTeam, deleteTeam } from './teams.service.js';
+import {
+  getAllTeamsForUser,
+  createNewTeam,
+  getTeamById,
+  updateTeam,
+  deleteTeam,
+  getMembersOfTeam,
+  promoteMemberToLeader,
+  demoteLeaderToMember
+} from "./teams.service.js";
 
 // GET /api/v1/teams - Mendapatkan semua tim yang diikuti user
 export const getAllTeams = async (req, res, next) => {
@@ -6,7 +15,7 @@ export const getAllTeams = async (req, res, next) => {
     const userId = req.user.id; // req.user.id didapat dari middleware autentikasi setelah user login
     const teams = await getAllTeamsForUser(userId);
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: { teams },
     });
   } catch (error) {
@@ -21,7 +30,7 @@ export const createTeam = async (req, res, next) => {
     const teamData = req.body;
     const newTeam = await createNewTeam(teamData, ownerId);
     res.status(201).json({
-      status: 'success',
+      status: "success",
       data: { team: newTeam },
     });
   } catch (error) {
@@ -35,7 +44,7 @@ export const getMyTeam = async (req, res, next) => {
     const { id } = req.params;
     const team = await getTeamById(id);
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: { team },
     });
   } catch (error) {
@@ -51,7 +60,7 @@ export const updateMyTeam = async (req, res, next) => {
     const teamData = req.body;
     const updatedTeam = await updateTeam(id, teamData, userId);
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: { team: updatedTeam },
     });
   } catch (error) {
@@ -66,8 +75,61 @@ export const deleteMyTeam = async (req, res, next) => {
     const userId = req.user.id;
     await deleteTeam(id, userId);
     res.status(204).json({
-      status: 'success',
+      status: "success",
       data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const memberToLeader = async (req, res, next) => {
+  try {
+    const { teamId, memberId } = req.params;
+    const currentUserId = req.user.id;
+
+    const updatedMembership = await promoteMemberToLeader(
+      teamId,
+      memberId,
+      currentUserId
+    );
+    res.status(200).json({
+      status: "success",
+      message: "Anggota tim berhasil dipromosikan menjadi Leader.",
+      data: updatedMembership,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const leaderToMember = async (req, res, next) => {
+  try {
+    const { teamId, memberId } = req.params;
+    const currentUserId = req.user.id;
+
+    const updatedMembership = await demoteLeaderToMember(
+      teamId,
+      memberId,
+      currentUserId
+    );
+    res.status(200).json({
+      status: "success",
+      message: "Leader tim berhasil diturunkan perannya menjadi Member.",
+      data: updatedMembership,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const getTeamMembers = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    const members = await getMembersOfTeam(teamId);
+    res.status(200).json({
+      status: "success",
+      count: members.length,
+      data: { members },
     });
   } catch (error) {
     next(error);

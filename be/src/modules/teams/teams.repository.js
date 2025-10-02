@@ -112,3 +112,35 @@ export const isMemberOfTeam = async (userId, teamId) => {
   // Jika ada row berarti user sudah menjadi member
   return result.rowCount > 0;
 };
+
+export const updateMemberRole = async (teamId, memberId, newRole) => {
+  const query = {
+    text: `UPDATE team_members SET role = $1 WHERE team_id = $2 AND user_id = $3 RETURNING *`,
+    values: [newRole, teamId, memberId],
+  };
+  const result = await pool.query(query);
+  return result.rows[0];
+};
+
+export const findMembersByTeamId = async (teamId) => {
+  const query = {
+    text: `
+        SELECT
+          u.id,
+          u.username,
+          u.email,
+          tm.role
+        FROM
+          users AS u
+        JOIN
+          team_members AS tm ON u.id = tm.user_id
+        WHERE
+          tm.team_id = $1
+        ORDER BY
+          tm.role, u.username;
+      `,
+    values: [teamId],
+  };
+  const result = await pool.query(query);
+  return result.rows;
+};
