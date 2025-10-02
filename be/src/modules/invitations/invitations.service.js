@@ -16,10 +16,7 @@ export const createInvitation = async (teamId, inviterId, inviteeEmail) => {
 
   if (user) {
     // 2. Jika user sudah ada, cek apakah sudah menjadi member tim
-    const isMember = await teamsRepository.isMemberOfTeam(
-      user.id,
-      teamId
-    );
+    const isMember = await teamsRepository.isMemberOfTeam(user.id, teamId);
     if (isMember) {
       throw new AppError(`${inviteeEmail} sudah menjadi anggota tim ini.`, 400);
     }
@@ -46,9 +43,9 @@ export const getPendingInvitationsForUser = async (userEmail) => {
 };
 
 export const INVITATION_STATUS = {
-  PENDING: 'PENDING',
-  ACCEPTED: 'ACCEPTED',
-  DECLINED: 'DECLINED',
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  DECLINED: "DECLINED",
 };
 
 export const respondToInvitation = async (invitationId, user, response) => {
@@ -62,7 +59,9 @@ export const respondToInvitation = async (invitationId, user, response) => {
   if (invitation.invitee_email !== user.email)
     throw new AppError("Anda tidak diizinkan merespon undangan ini.", 403);
 
-  if (![INVITATION_STATUS.ACCEPTED, INVITATION_STATUS.DECLINED].includes(response)) {
+  if (
+    ![INVITATION_STATUS.ACCEPTED, INVITATION_STATUS.DECLINED].includes(response)
+  ) {
     throw new AppError(
       `Respon tidak valid. Gunakan '${INVITATION_STATUS.ACCEPTED}' atau '${INVITATION_STATUS.DECLINED}'.`,
       400
@@ -72,18 +71,25 @@ export const respondToInvitation = async (invitationId, user, response) => {
   if (response === INVITATION_STATUS.ACCEPTED) {
     const client = await pool.connect();
     try {
-      await client.query('BEGIN');
-      const updatedInvitation = await updateInvitationStatus(invitationId, INVITATION_STATUS.ACCEPTED, client);
+      await client.query("BEGIN");
+      const updatedInvitation = await updateInvitationStatus(
+        invitationId,
+        INVITATION_STATUS.ACCEPTED,
+        client
+      );
       await addTeamMember(user.id, invitation.team_id, client);
-      await client.query('COMMIT');
+      await client.query("COMMIT");
       return updatedInvitation;
     } catch (error) {
-      await client.query('ROLLBACK');
+      await client.query("ROLLBACK");
       throw error;
     } finally {
       client.release();
     }
   } else if (response === INVITATION_STATUS.DECLINED) {
-    return await updateInvitationStatus(invitationId, INVITATION_STATUS.DECLINED);
+    return await updateInvitationStatus(
+      invitationId,
+      INVITATION_STATUS.DECLINED
+    );
   }
 };
