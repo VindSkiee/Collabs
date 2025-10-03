@@ -16,7 +16,7 @@ import teamRouter from "./src/modules/teams/teams.route.js";
 import userRouter from "./src/modules/users/users.route.js";
 // import tasksRouter from "./src/modules/tasks/tasks.route.js";
 import invitationRouter from "./src/modules/invitations/invitations.route.js";
-// import channelRouter from "./src/modules/channels/channel.route.js";
+import channelRouter from "./src/modules/channels/channels.route.js";
 // import meetingRouter from "./src/modules/meetings/meeting.route.js";
 
 const app = express();
@@ -67,7 +67,7 @@ app.use("/api/v1/user", userRouter); // user route
 app.use("/api/v1/team", teamRouter); // team route
 // app.use("/api/v1/task", tasksRouter); // tasks route
 app.use("/api/v1/invitation", invitationRouter); // invitation route
-// app.use("/api/v1/channel", channelRouter); // channel route
+app.use("/api/v1/channel", channelRouter); // channel route
 // app.use("/api/v1/meeting", meetingRouter); // meetings route
 
 // Rate limiting
