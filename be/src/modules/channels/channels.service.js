@@ -14,6 +14,8 @@ import {
 import * as teamsRepository from "../teams/teams.repository.js";
 import AppError from "../../utils/appError.js";
 import { pool } from "../../../config/db.js";
+import * as usersRepository from '../users/users.repository.js';
+import { getIO } from "../../socket.js";
 
 // Membuat channel baru (dengan transaksi)
 export const createChannel = async (data) => {
@@ -107,18 +109,36 @@ export const deleteChannel = async (channelId) => {
 
 // Post message
 export const postMessage = async (channelId, userId, content) => {
-  const channel = await findChannelById(channelId);
-  if (channel.chat_mode === "LEADERS_ONLY") {
-    const membership = await findChannelMember(channelId, userId);
-    if (!membership || membership.role !== "LEADER") {
-      throw new AppError(
-        "Hanya Leader yang bisa mengirim pesan di channel ini.",
-        403
-      );
-    }
+  const channel = await channelsRepository.findById(channelId);
+  if (!channel) throw new AppError('Channel tidak ditemukan.', 404);
+
+  const membership = await findChannelMember(channelId, userId);
+  if (!membership) throw new AppError('Anda bukan anggota channel ini.', 403);
+
+  if (channel.chat_mode === 'LEADERS_ONLY' && membership.role !== 'LEADER') {
+    throw new AppError('Hanya Leader yang bisa mengirim pesan di channel ini.', 403);
   }
 
-  return await createChannelMessage(channelId, userId, content);
+  // Simpan pesan
+  const user = await usersRepository.findById(userId);
+  const newMessage = await createChannelMessage({
+    channelId,
+    userId,
+    content,
+  });
+
+  // Broadcast ke room channel
+  const io = getIO();
+  const payload = {
+    ...newMessage,
+    user: {
+      id: user.id,
+      username: user.username,
+    },
+  };
+  io.to(`channel-${channel.id}`).emit('newMessage', payload);
+
+  return newMessage;
 };
 
 export const joinOrRequestToJoinChannel = async (channelId, userId) => {

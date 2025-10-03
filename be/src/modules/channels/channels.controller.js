@@ -133,12 +133,15 @@ export const remove = async (req, res, next) => {
 // Post message
 export const message = async (req, res, next) => {
   try {
-    const msg = await postMessage(
-      req.params.channelId,
-      req.user.id,
-      req.body.content
-    );
-    res.status(201).json({ status: "success", data: { message: msg } });
+    const { channelId } = req.params;
+    const { content } = req.body;
+    const user = req.user; // req.user sudah berisi payload JWT dari middleware
+
+    // Service akan mengembalikan pesan yang disimpan di DB
+    const message = await postMessage(channelId, user, content);
+
+    // Kirim response HTTP seperti biasa
+    res.status(201).json({ status: "success", data: { message } });
   } catch (error) {
     next(error);
   }

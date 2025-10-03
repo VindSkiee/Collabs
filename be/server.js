@@ -10,6 +10,9 @@ import { pool } from "./config/db.js";
 import { ENV } from "./config/env.js";
 import hpp from "hpp";
 import { sanitizeMiddleware } from "./src/middlewares/sanitize.middleware.js";
+import http from 'http'; // Modul bawaan Node.js
+import { initializeSocketIO } from "./src/socketManager.js"; // yang udah kamu buat
+import { Server } from "socket.io";
 
 import authRouter from "./src/modules/auth/auth.route.js";
 import teamRouter from "./src/modules/teams/teams.route.js";
@@ -73,6 +76,20 @@ app.use("/api/v1/channel", channelRouter); // channel route
 // Rate limiting
 app.use(apiLimiter);
 
+const server = http.createServer(app);
+// Init Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: [
+      process.env.FRONTEND_URL || "http://localhost:3000",
+      "http://localhost:5173"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
+});
+initializeSocketIO(io);
+
 // Routes example
 app.get("/", (req, res) => {
   logger.info("Root endpoint accessed");
@@ -84,7 +101,8 @@ app.use(errorMiddleware);
 
 // Start Server
 
-app.listen(ENV.PORT, async () => {
+// Start Server pakai server.listen (bukan app.listen!)
+server.listen(ENV.PORT, async () => {
   try {
     await pool.query("SELECT 1");
     logger.info("Database connected");
